@@ -1,0 +1,35 @@
+{
+    "paths": [
+        {
+            "name": "/hello",
+            "lambdaFunction": "greetingfunction",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/hello"
+        }
+    ],
+    "resourceName": "nodeapi",
+    "apiName": "nodeapi",
+    "functionArns": [
+        {
+            "lambdaFunction": "greetingfunction"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "amplify-streamhousemanager-dev-75526-authRole",
+        "unAuthRoleName": "amplify-streamhousemanager-dev-75526-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "greetingfunction",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

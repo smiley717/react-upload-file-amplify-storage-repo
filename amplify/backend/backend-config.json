@@ -1,55 +1,55 @@
 {
   "auth": {
-    "reactamplifyad1b9b9b": {
+    "streamhousemanager3e8554ee": {
       "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  },
+  "function": {
+    "S3Trigger8d857ea8": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
+    },
+    "greetingfunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "storage": {
+    "s3c673b561": {
+      "service": "S3",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "reactamplifyad1b9b9bDefineAuthChallenge",
-          "triggerProvider": "Cognito",
+          "resourceName": "S3Trigger8d857ea8",
           "attributes": [
+            "Name",
             "Arn",
-            "Name"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "reactamplifyad1b9b9bCreateAuthChallenge",
-          "triggerProvider": "Cognito",
-          "attributes": [
-            "Arn",
-            "Name"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "reactamplifyad1b9b9bVerifyAuthChallengeResponse",
-          "triggerProvider": "Cognito",
-          "attributes": [
-            "Arn",
-            "Name"
+            "LambdaExecutionRole"
           ]
         }
-      ],
-      "customAuth": true
+      ]
     }
   },
-  "function": {
-    "reactamplifyad1b9b9bDefineAuthChallenge": {
-      "build": true,
+  "api": {
+    "nodeapi": {
+      "service": "API Gateway",
       "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "reactamplifyad1b9b9bCreateAuthChallenge": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "reactamplifyad1b9b9bVerifyAuthChallengeResponse": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "greetingfunction",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
     }
   }
 }
