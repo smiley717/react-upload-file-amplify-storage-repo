@@ -1,6 +1,6 @@
 import './App.css';
 import React, {useEffect, useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import TopAppBar from "./components/TopAppBar";
@@ -17,17 +17,11 @@ import LinearProgress from "@material-ui/core/LinearProgress/LinearProgress";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import VideoList from "./components/VideoList";
 import ReactPlayer from "react-player";
+import {AMPLIFY_UPLOADED_FOLDER} from "./config/constant";
 
-import Amplify, { Storage } from 'aws-amplify';
-import {
-  AmplifyAuthenticator,
-  AmplifySignOut,
-  AmplifySignIn,
-  AmplifySignUp,
-  withAuthenticator
-} from '@aws-amplify/ui-react'
+import {Storage} from 'aws-amplify';
+import {withAuthenticator} from '@aws-amplify/ui-react'
 import './aws-exports';
-import Container from "@material-ui/core/Box/Box";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -60,19 +54,23 @@ function App() {
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-
-  useEffect(async () => {
+  const fetchVideoList = async () => {
     setIsLoading(true);
-    Storage.list('', {level: ''}) // for listing ALL files without prefix, pass '' instead
+    await Storage.list(AMPLIFY_UPLOADED_FOLDER, {level: ''}) // for listing ALL files without prefix, pass '' instead
       .then(result => {
         console.log(result);
         setIsLoading(false);
         setList(result)
       })
       .catch(err => {
-        console.log(err)
+        console.log(err);
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchVideoList();
+
   }, []);
 
   const onChange = (e) => {
@@ -83,13 +81,16 @@ function App() {
     }
   };
 
+  const handleClick = () => {
+    alert(1);
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (file) {
       setResponse(`Uploading...`);
-      console.log(name + ":" + file.type)
-      let folder = '';
-      await Storage.put(folder + name, file, {
+      console.log(name + ":" + file.type);
+      await Storage.put(AMPLIFY_UPLOADED_FOLDER + name, file, {
         contentType: file.type,
         progressCallback(progress) {
           console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
@@ -98,13 +99,18 @@ function App() {
       })
         .then((result) => {
           console.log(result);
-          setProgress(0);
-          setResponse(`Success uploading file: ${name}!`)
+          setResponse(`Success uploading file: ${name}!`);
+          const index = list.findIndex((e) => e.key === result.key);
+          if (index === -1) {
+            fetchVideoList();
+          }
         })
         .then(() => {
           document.getElementById('file-input').value = null;
-          setFile(null)
-          setName('')
+          setProgress(0);
+          setFile(null);
+          setName('');
+          setResponse('');
         })
         .catch((err) => {
           console.log(err);
@@ -119,9 +125,9 @@ function App() {
     e.preventDefault();
     setProgress(0);
     document.getElementById('file-input').value = null;
-    setFile(null)
+    setFile(null);
     setName('')
-  }
+  };
 
   return (
     <Box color="text.primary" component="span" m={0}>
@@ -167,6 +173,7 @@ function App() {
                         type='submit'
                         color='default'
                         className={classes.button}
+                        onClick={(e) => onCancelUpload(e)}
                         startIcon={<CloseIcon />}
                       >
                         Cancel
@@ -202,13 +209,12 @@ function App() {
                 <Grid container justify='center'>
                   <CircularProgress />
                 </Grid>
-                ) : (<VideoList data={list} />)
+                ) : (<VideoList data={list}/>)
             }
 
           </Paper>
         </Grid>
         <Grid item xs={6} className={classes.videoPlayer}>
-          <AmplifySignOut/>
           <ReactPlayer url={'https://s3.amazonaws.com/codecademy-content/courses/React/react_video-fast.mp4'}
                        playing={false}
                        width='100%'

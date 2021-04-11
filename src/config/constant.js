@@ -1,0 +1,3 @@
+const AMPLIFY_UPLOADED_FOLDER = 'uploaded/'
+
+export {AMPLIFY_UPLOADED_FOLDER}
